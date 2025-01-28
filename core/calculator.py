@@ -1,4 +1,4 @@
-import operator
+import operator, math
 from queue import LifoQueue
 from typing import List, Union
 
@@ -9,13 +9,14 @@ class InvalidNumberOrOperator(Exception):
 
 class Calculator:
     operators = {
-        # operator: (Priority, function)
-        '+': (8, operator.add),
-        '-': (8, operator.sub),
-        '*': (9, operator.mul),
-        '/': (9, operator.truediv),
-        '^': (10, operator.pow),
-        '%': (9, operator.mod),
+        # operator: (Priority, function, input_count)
+        '+': (8, operator.add, 2),
+        '-': (8, operator.sub, 2),
+        '*': (9, operator.mul, 2),
+        '/': (9, operator.truediv, 2),
+        '^': (10, operator.pow, 2),
+        '%': (9, operator.mod, 2),
+        'log': (11, math.log10, 1)
     }
 
     def __init__(self, string_input: str):
@@ -50,13 +51,17 @@ class Calculator:
         numbers_stack = LifoQueue()
         for string in postfix_string:
             if string in self.operators.keys():
-                if numbers_stack.empty():
-                    raise InvalidNumberOrOperator("invalid numbers input, didnt have any number")
-                number_2 = numbers_stack.get()
-                if numbers_stack.empty():
-                    raise InvalidNumberOrOperator("invalid numbers input, you have send one number")
-                number_1 = numbers_stack.get()
-                result = self.operators[string][1](number_1, number_2)
+                numbers = []
+                count_of_digits = Calculator.operators[string][2]
+                for i in range(count_of_digits):
+                    if numbers_stack.empty():
+                        raise InvalidNumberOrOperator(
+                            f"invalid numbers input, you have send {count_of_digits} number, you need to send "
+                            f"{count_of_digits - i} number more"
+                        )
+                    numbers.append(numbers_stack.get())
+
+                result = self.operators[string][1](*list(reversed(numbers)))
                 numbers_stack.put(result)
             else:
                 numbers_stack.put(int(string))
