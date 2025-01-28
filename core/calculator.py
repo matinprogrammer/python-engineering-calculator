@@ -17,7 +17,13 @@ class Calculator:
         '/': (9, operator.truediv, 2),
         '^': (10, operator.pow, 2),
         '%': (9, operator.mod, 2),
-        'log': (11, math.log10, 1)
+        'log': (11, math.log10, 1),
+        'sqrt': (11, math.sqrt, 1),
+        'sin': (11, math.sin, 1),
+        'cos': (11, math.cos, 1),
+        'tan': (11, math.tan, 1),
+        'asin': (11, math.asin, 1),
+        'atan': (11, math.atan, 1),
     }
 
     def __init__(self, string_input: str):
