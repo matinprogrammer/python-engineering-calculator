@@ -1,6 +1,7 @@
 import operator, math
 from queue import LifoQueue
 from typing import List, Union
+from .utils import isnumber
 
 
 class InvalidNumberOrOperator(Exception):
@@ -41,35 +42,11 @@ class Calculator:
             if not any([
                 string in list(Calculator.operators.keys()) + ['(', ')'],
                 string.isnumeric(),
-                string.isalpha()
+                string.isalpha(),
+                string == '.'
             ]):
                 return False
         return True
-
-    def evaluate(self):
-        postfix_string = self.convert_infix_to_postfix(self.string_input)
-        numbers_stack = LifoQueue()
-        for string in postfix_string:
-            if string in self.operators.keys():
-                numbers = []
-                count_of_digits = Calculator.operators[string][2]
-                for i in range(count_of_digits):
-                    if numbers_stack.empty():
-                        raise InvalidNumberOrOperator(
-                            f"invalid numbers input, you have send {count_of_digits} number, you need to send "
-                            f"{count_of_digits - i} number more"
-                        )
-                    numbers.append(numbers_stack.get())
-
-                result = self.operators[string][1](*list(reversed(numbers)))
-                numbers_stack.put(result)
-            else:
-                numbers_stack.put(int(string))
-
-        if numbers_stack.empty():
-            return 0
-        else:
-            return numbers_stack.get()
 
     @staticmethod
     def slice_infix_string_to_list(infix_string: str) -> List:
@@ -79,7 +56,7 @@ class Calculator:
         current_string_operation = ''
 
         for string in infix_string:
-            if string.isnumeric():
+            if string.isnumeric() or string == '.':
                 current_number += string
             elif string.isalpha():
                 current_string_operation += string
@@ -131,7 +108,7 @@ class Calculator:
                 while stack_value != '(':
                     postfix_result.append(stack_value)
                     stack_value = stack.get()
-            elif string.isnumeric():
+            elif isnumber(string):
                 postfix_result.append(string)
             else:
                 raise InvalidNumberOrOperator("your input invalid number or operator")
@@ -141,4 +118,29 @@ class Calculator:
             postfix_result.append(stack.get())
 
         return postfix_result
+
+    def evaluate(self):
+        postfix_string = self.convert_infix_to_postfix(self.string_input)
+        numbers_stack = LifoQueue()
+        for string in postfix_string:
+            if string in self.operators.keys():
+                numbers = []
+                count_of_digits = Calculator.operators[string][2]
+                for i in range(count_of_digits):
+                    if numbers_stack.empty():
+                        raise InvalidNumberOrOperator(
+                            f"invalid numbers input, you have send {count_of_digits} number, you need to send "
+                            f"{count_of_digits - i} number more"
+                        )
+                    numbers.append(numbers_stack.get())
+
+                result = self.operators[string][1](*list(reversed(numbers)))
+                numbers_stack.put(result)
+            else:
+                numbers_stack.put(float(string))
+
+        if numbers_stack.empty():
+            return 0
+        else:
+            return numbers_stack.get()
 
