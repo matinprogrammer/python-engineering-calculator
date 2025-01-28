@@ -1,6 +1,6 @@
 import operator
 from queue import LifoQueue
-from typing import List
+from typing import List, Union
 
 
 class InvalidNumberOrOperator(Exception):
@@ -15,7 +15,7 @@ class Calculator:
         '*': (9, operator.mul),
         '/': (9, operator.truediv),
         '^': (10, operator.pow),
-        '%': (9, operator.mod)
+        '%': (9, operator.mod),
     }
 
     def __init__(self, string_input: str):
@@ -67,14 +67,44 @@ class Calculator:
             return numbers_stack.get()
 
     @staticmethod
-    def convert_infix_to_postfix(infix_string: str) -> List[str]:
+    def slice_infix_string_to_list(infix_string: str) -> List:
+        infix_list = []
+
+        current_number = ''
+        current_string_operation = ''
+
+        for string in infix_string:
+            if string.isnumeric():
+                current_number += string
+            elif string.isalpha():
+                current_string_operation += string
+            elif string in list(Calculator.operators.keys()) + ['(', ')']:
+                if current_number:
+                    infix_list.append(current_number)
+                if current_string_operation:
+                    infix_list.append(current_string_operation)
+                current_number = ''
+                current_string_operation = ''
+                infix_list.append(string)
+            else:
+                infix_list.append(string)
+
+        if current_number:
+            infix_list.append(current_number)
+        if current_string_operation:
+            infix_list.append(current_string_operation)
+
+        return infix_list
+
+    @staticmethod
+    def convert_infix_to_postfix(infix_list: Union[str, List]) -> List[str]:
+        if isinstance(infix_list, str):
+            infix_list = Calculator.slice_infix_string_to_list(infix_list)
+
         stack = LifoQueue()
         postfix_result = []
 
-        if infix_string:
-            postfix_result.append("")
-
-        for string in infix_string:
+        for string in infix_list:
             if string in Calculator.operators.keys():
                 while not stack.empty():
                     last_operator = stack.get()
@@ -97,20 +127,13 @@ class Calculator:
                     postfix_result.append(stack_value)
                     stack_value = stack.get()
             elif string.isnumeric():
-                postfix_result[-1] += string
-                continue
+                postfix_result.append(string)
             else:
                 raise InvalidNumberOrOperator("your input invalid number or operator")
 
-            # add blank cell in postfix_result to concatenate number together
-            if postfix_result[-1] != '':
-                postfix_result.append("")
-
         # add remaining operator from stack in postfix_result
         while not stack.empty():
-            if postfix_result[-1] == '':
-                postfix_result[-1] = stack.get()
-            else:
-                postfix_result.append(stack.get())
+            postfix_result.append(stack.get())
 
         return postfix_result
+

@@ -162,3 +162,61 @@ class TestCalculatorPrefixToPostfix(TestCase):
         actual = Calculator.convert_infix_to_postfix('100+20')
         expected = ['100', '20', '+']
         self.assertEqual(actual, expected)
+
+    # def test_logarithm(self):
+    #     actual = Calculator.convert_infix_to_postfix('log(9)')
+    #     expected = ['9', 'log']
+    #     self.assertEqual(actual, expected)
+
+
+class TestCalculatorSliceInfixStringToList(TestCase):
+    def test_empty(self):
+        actual = Calculator.slice_infix_string_to_list('')
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_one_number(self):
+        actual = Calculator.slice_infix_string_to_list('1')
+        expected = ['1']
+        self.assertEqual(actual, expected)
+
+    def test_two_digit_number(self):
+        actual = Calculator.slice_infix_string_to_list('10')
+        expected = ['10']
+        self.assertEqual(actual, expected)
+
+    def test_three_digit_number(self):
+        actual = Calculator.slice_infix_string_to_list('123')
+        expected = ['123']
+        self.assertEqual(actual, expected)
+
+    def test_simple_add(self):
+        actual = Calculator.slice_infix_string_to_list('1+2')
+        expected = ['1', '+', '2']
+        self.assertEqual(actual, expected)
+
+    def test_two_digit_number_add(self):
+        actual = Calculator.slice_infix_string_to_list('10+59')
+        expected = ['10', '+', '59']
+        self.assertEqual(actual, expected)
+
+    def test_logarithm(self):
+        actual = Calculator.slice_infix_string_to_list('log(10)')
+        expected = ['log', '(', '10', ')']
+        self.assertEqual(actual, expected)
+
+    def test_logarithm_with_add_in(self):
+        actual = Calculator.slice_infix_string_to_list('log(10+3)')
+        expected = ['log', '(', '10', '+', '3', ')']
+        self.assertEqual(actual, expected)
+
+    def test_logarithm_with_add_out(self):
+        actual = Calculator.slice_infix_string_to_list('log(10)+11')
+        expected = ['log', '(', '10', ')', '+', '11']
+        self.assertEqual(actual, expected)
+
+    def test_complex(self):
+        actual = Calculator.slice_infix_string_to_list('1+2-3*4+log(5/6)*11-sin(9+4*9)')
+        expected = ['1', '+', '2', '-', '3', '*', '4', '+', 'log', '(', '5', '/', '6', ')', '*', '11',
+                    '-', 'sin', '(', '9', '+', '4', '*', '9', ')']
+        self.assertEqual(actual, expected)
