@@ -1,4 +1,6 @@
 import tkinter as tk
+import os
+import pkgutil
 from core.calculator import Calculator, InvalidNumberOrOperator
 
 
@@ -8,6 +10,17 @@ class CalculatorGui:
         self.root.title("Calculator")
         self.root.resizable(False, False)
         self.root.bind('<Return>', self.evaluate)
+
+        try:
+            self.root.iconbitmap(os.path.join(os.getcwd(), "desktop_gui/media/icon.ico"))
+        except tk.TclError as e:
+            if not os.path.exists("media/"):
+                os.mkdir("media")
+            icon_data = pkgutil.get_data(__name__, '/media/icon.ico')
+            with open('media/icon.ico', 'wb') as temp_icon_file:
+                temp_icon_file.write(icon_data)
+            icon_path = os.path.join(os.getcwd(), 'media/icon.ico')
+            self.root.iconbitmap(icon_path)
 
         self.input_zone = tk.Entry(self.root, width=40, borderwidth=5, font=2)
         self.input_zone.bind("<KeyRelease>", lambda event: self.evaluate() if event.keycode == 187 else "")
