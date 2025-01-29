@@ -75,6 +75,31 @@ class TestCalculatorSliceInfixStringToList(TestCase):
         expected = ['1.5']
         self.assertEqual(actual, expected)
 
+    def test_negative_number(self):
+        actual = Calculator.slice_infix_string_to_list('-1')
+        expected = ['-1']
+        self.assertEqual(actual, expected)
+
+    def test_negative_float_number(self):
+        actual = Calculator.slice_infix_string_to_list('-1.6')
+        expected = ['-1.6']
+        self.assertEqual(actual, expected)
+
+    def test_negative_number_in_parentheses(self):
+        actual = Calculator.slice_infix_string_to_list('(-1)')
+        expected = ['(', '-1', ')']
+        self.assertEqual(actual, expected)
+
+    def test_add_negative_number(self):
+        actual = Calculator.slice_infix_string_to_list('1+(-2)')
+        expected = ['1', '+', '(', '-2', ')']
+        self.assertEqual(actual, expected)
+
+    def test_two_digit_negative_number(self):
+        actual = Calculator.slice_infix_string_to_list('-10')
+        expected = ['-10']
+        self.assertEqual(actual, expected)
+
 
 class TestCalculatorPrefixToPostfix(TestCase):
     def test_empty(self):
@@ -155,6 +180,21 @@ class TestCalculatorPrefixToPostfix(TestCase):
     def test_float_number(self):
         actual = Calculator.convert_infix_to_postfix('1.5+5')
         expected = ['1.5', '5', '+']
+        self.assertEqual(actual, expected)
+
+    def test_negative_number(self):
+        actual = Calculator.convert_infix_to_postfix('-1')
+        expected = ['-1']
+        self.assertEqual(actual, expected)
+
+    def test_add_negative_number(self):
+        actual = Calculator.convert_infix_to_postfix('-1+2')
+        expected = ['-1', '2', '+']
+        self.assertEqual(actual, expected)
+
+    def test_add_negative_number_in_parentheses(self):
+        actual = Calculator.convert_infix_to_postfix('1+(-2)')
+        expected = ['1', '-2', '+']
         self.assertEqual(actual, expected)
 
 
@@ -249,4 +289,19 @@ class TestCalculatorEvaluate(TestCase):
     def test_add_two_float(self):
         actual = Calculator("1.5+5.5").evaluate()
         expected = 7.0
+        self.assertEqual(actual, expected)
+
+    def test_negative_number(self):
+        actual = Calculator("-1").evaluate()
+        expected = -1
+        self.assertEqual(actual, expected)
+
+    def test_add_negative_number(self):
+        actual = Calculator("-1+2").evaluate()
+        expected = 1
+        self.assertEqual(actual, expected)
+
+    def test_add_negative_number_in_parentheses(self):
+        actual = Calculator("1+(-2)").evaluate()
+        expected = -1
         self.assertEqual(actual, expected)

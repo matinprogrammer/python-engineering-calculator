@@ -1,4 +1,5 @@
-import operator, math
+import operator
+import math
 from queue import LifoQueue
 from typing import List, Union
 from .utils import isnumber
@@ -30,20 +31,20 @@ class Calculator:
         self.string_input = string_input
 
     @property
-    def string_input(self):
+    def string_input(self) -> str:
         return self._string_input
 
     @string_input.setter
     def string_input(self, value: str):
         # check validate value
-        value = value.replace(" ", "")
+        value = value.replace(" ", "").rstrip("=")
         if not self.check_validate_input(value):
             raise InvalidNumberOrOperator("you use unexpected character")
 
         self._string_input = value
 
     @staticmethod
-    def check_validate_input(value):
+    def check_validate_input(value) -> bool:
         for string in value:
             if not any([
                 string in list(Calculator.operators.keys()) + ['(', ')'],
@@ -60,6 +61,7 @@ class Calculator:
 
         current_number = ''
         current_string_operation = ''
+        minus_number = True
 
         for string in infix_string:
             if string.isnumeric() or string == '.':
@@ -67,6 +69,11 @@ class Calculator:
             elif string.isalpha():
                 current_string_operation += string
             elif string in list(Calculator.operators.keys()) + ['(', ')']:
+                if string == '-' and minus_number:
+                    current_number = string
+                    minus_number = False
+                    continue
+
                 if current_number:
                     infix_list.append(current_number)
                 if current_string_operation:
@@ -76,6 +83,11 @@ class Calculator:
                 infix_list.append(string)
             else:
                 infix_list.append(string)
+
+            if string == "(":
+                minus_number = True
+            else:
+                minus_number = False
 
         if current_number:
             infix_list.append(current_number)
@@ -125,7 +137,7 @@ class Calculator:
 
         return postfix_result
 
-    def evaluate(self):
+    def evaluate(self) -> float:
         postfix_string = self.convert_infix_to_postfix(self.string_input)
         numbers_stack = LifoQueue()
         for string in postfix_string:
@@ -149,4 +161,3 @@ class Calculator:
             return 0
         else:
             return numbers_stack.get()
-
